@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), ButtonFragment.ButtonInterface {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -15,10 +15,13 @@ class MainActivity : AppCompatActivity() {
             supportFragmentManager.beginTransaction().add(R.id.dieContainer, newDie100).commit()
         }
 
-        findViewById<Button>(R.id.rollDiceButton).setOnClickListener{
-            (supportFragmentManager
-                .findFragmentById(R.id.dieContainer) as DieFragment).throwDie()
-        }
+
+    }
+
+    override fun buttonClicked() {
+        (supportFragmentManager
+            .findFragmentById(R.id.dieContainer)
+                as DieFragment).throwDie()
     }
 
 }
