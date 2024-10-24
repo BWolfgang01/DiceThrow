@@ -6,29 +6,28 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.lifecycle.ViewModelProvider
 import kotlin.random.Random
 
-const val DIESIDE = "sidenumber"
+private const val DIESIDE = "sidenumber"
 
 class DieFragment : Fragment() {
-    val DIEROLLKEY : String = "diceroll"
 
-    lateinit var dieTextView: TextView
-    var dieSides: Int = 6
-    var diceThrowResult: Int = 0
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putInt(DIEROLLKEY, diceThrowResult)
-    }
+    private lateinit var dieViewModel: DieViewModel
+    private lateinit var dieTextView: TextView
+    private var dieSides: Int = 6
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
+
+        dieViewModel = ViewModelProvider(requireActivity())[DieViewModel::class.java]
+
+            arguments?.let {
             it.getInt(DIESIDE).run {
                 dieSides = this
             }
         }
+
     }
 
     override fun onCreateView(
@@ -43,25 +42,18 @@ class DieFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        savedInstanceState?.run {
-            diceThrowResult = this.getInt(DIEROLLKEY)
+
+        dieViewModel.getDieRoll().observe(viewLifecycleOwner) {
+            dieTextView.text = it.toString()
         }
-        if(diceThrowResult == 0){
-            throwDie()
-        }
-        else{
-            dieTextView.text = diceThrowResult.toString()
-        }
-        view.setOnClickListener{
+        if (dieViewModel.getDieRoll().value == null){
             throwDie()
         }
     }
 
     fun throwDie() {
-        val roll = Random.nextInt(dieSides) + 1
+        dieViewModel.setDieRoll(Random.nextInt(dieSides) + 1)
 
-        dieTextView.text = roll.toString()
-        diceThrowResult = roll
     }
 
     companion object{
